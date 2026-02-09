@@ -1,6 +1,6 @@
 {
-  "name": "Barkod Üretici Pro",
-  "short_name": "Barkod",
+  "name": "Barkod Studio Pro",
+  "short_name": "BarkodPro",
   "description": "Profesyonel Barkod Oluşturucu",
   "start_url": ".",
   "display": "standalone",
