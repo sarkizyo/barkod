@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Barkod Üretici</title>
+    <title>Barkod Üretici Pro</title>
     
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/241/241528.png">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-    
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
     <style>
-        /* Safari ve Mobil Optimizasyonları */
-        html, body {
-            touch-action: manipulation;
-            height: 100%;
-            overflow-y: auto;
-            -webkit-font-smoothing: antialiased;
-        }
-
         #barcode-container {
             width: 100%;
             display: flex;
@@ -26,78 +26,122 @@
             padding: 24px;
             border-radius: 1.5rem;
         }
-
         svg { width: 100%; max-width: 280px; height: auto; }
-
-        /* iOS klavye açıldığında zoom yapmaması için font min 16px olmalı */
-        input { 
-            font-size: 16px !important; 
-            -webkit-appearance: none;
-            border-radius: 1rem;
-        }
-
-        /* Klavye açıldığında sayfanın yukarı kayabilmesi için alt boşluk */
-        .content-wrapper {
-            padding-bottom: 250px; 
+        body { transition: background-color 0.3s ease; }
+        input { font-size: 16px !important; }
+        /* PWA Yükleme Butonu Stili */
+        #pwa-install {
+            display: none;
+            position: fixed;
+            top: 20px;
+            background: #2563eb;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+            z-index: 100;
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900 min-h-screen">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen flex flex-col items-center justify-center p-4">
 
-    <div class="content-wrapper w-full flex flex-col items-center px-4 pt-12">
+    <button id="pwa-install">Uygulamayı Yükle</button>
+
+    <div class="w-full max-w-sm bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl p-8 space-y-6 border border-slate-100 dark:border-slate-800 transition-all relative">
         
-        <div class="w-full max-w-sm bg-white rounded-[2.5rem] shadow-xl p-8 space-y-6 border border-slate-100">
-            
-            <div class="text-center">
-                <h1 class="text-2xl font-black text-blue-600 tracking-tighter uppercase">Barkod Üretici</h1>
-            </div>
-
-            <div id="barcode-container" class="shadow-inner border border-slate-50">
-                <svg id="barcode"></svg>
-            </div>
-
-            <div class="space-y-4">
-                <div class="space-y-2">
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Barkod İçeriği</label>
-                    <div class="relative flex items-center">
-                        <input type="text" id="barcodeValue" value="KOD-12345" 
-                            class="w-full bg-slate-100 border-none p-5 pr-20 text-lg font-bold outline-none focus:ring-4 focus:ring-blue-500/10 transition-all uppercase"
-                            oninput="generateBarcode()">
-                        
-                        <button onclick="pasteText()" class="absolute right-2 bg-white text-blue-600 font-bold px-3 py-2.5 rounded-xl shadow-sm border border-slate-200 text-[10px] active:scale-90 transition-all">
-                            YAPIŞTIR
-                        </button>
-                    </div>
-                </div>
-
-                <div class="flex flex-col gap-3 pt-2">
-                    <button onclick="downloadPNG()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-5 rounded-2xl shadow-lg shadow-blue-200 active:scale-95 transition-all flex items-center justify-center gap-2">
-                        PNG OLARAK KAYDET
-                    </button>
-                    
-                    <button onclick="clearInput()" class="w-full text-slate-400 font-bold py-2 hover:text-red-500 transition-all text-[10px] uppercase tracking-widest text-center">
-                        TEMİZLE
-                    </button>
-                </div>
-            </div>
+        <div class="flex justify-between items-center mb-2">
+            <h1 class="text-2xl font-black text-blue-600 dark:text-blue-400 tracking-tighter">BARKOD</h1>
+            <button onclick="toggleDarkMode()" class="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 active:scale-90 transition-all">
+                <span id="theme-icon" class="text-lg">🌙</span>
+            </button>
         </div>
 
-        <p class="mt-8 text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em] italic">
-            GÜRSES TEKNOLOJİ
-        </p>
+        <div id="barcode-container" class="shadow-inner border border-slate-50">
+            <svg id="barcode"></svg>
+        </div>
+
+        <div class="space-y-4">
+            <div class="space-y-2">
+                <label class="block text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] ml-1">Barkod İçeriği</label>
+                <div class="relative flex items-center">
+                    <input type="text" id="barcodeValue" value="KOD-12345" 
+                        class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-2xl p-5 pr-20 text-lg font-bold outline-none focus:ring-4 focus:ring-blue-500/10 transition-all dark:text-white uppercase"
+                        oninput="generateBarcode()">
+                    
+                    <button onclick="pasteText()" class="absolute right-2 bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 font-bold px-3 py-2.5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-600 text-[10px] active:scale-90 transition-all">
+                        YAPIŞTIR
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-3 pt-2">
+                <button onclick="downloadPNG()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-5 rounded-2xl shadow-lg shadow-blue-200 dark:shadow-none active:scale-95 transition-all flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                    PNG OLARAK KAYDET
+                </button>
+                
+                <button onclick="clearInput()" class="w-full text-slate-400 dark:text-slate-500 font-bold py-2 rounded-2xl hover:text-red-500 transition-all text-[10px] uppercase tracking-widest">
+                    TEMİZLE
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Barkod Üretme Fonksiyonu
+        // --- PWA Service Worker Kaydı ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js');
+            });
+        }
+
+        // --- PWA Yükleme Promptu ---
+        let deferredPrompt;
+        const installBtn = document.getElementById('pwa-install');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'block';
+        });
+
+        installBtn.addEventListener('click', () => {
+            installBtn.style.display = 'none';
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                deferredPrompt = null;
+            });
+        });
+
+        // --- Mevcut Fonksiyonlar ---
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                icon.innerText = '🌙';
+                localStorage.theme = 'light';
+            } else {
+                html.classList.add('dark');
+                icon.innerText = '☀️';
+                localStorage.theme = 'dark';
+            }
+        }
+
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            document.getElementById('theme-icon').innerText = '☀️';
+        }
+
         function generateBarcode() {
             const val = document.getElementById("barcodeValue").value;
-            const container = document.getElementById("barcode");
-
             if (!val.trim()) {
-                container.innerHTML = "";
+                document.getElementById("barcode").innerHTML = "";
                 return;
             }
-
             try {
                 JsBarcode("#barcode", val, {
                     format: "CODE128",
@@ -110,59 +154,43 @@
                     lineColor: "#000000",
                     background: "#ffffff"
                 });
-            } catch (e) {
-                console.error("Barkod hatası");
-            }
+            } catch (e) { console.warn("Hata"); }
         }
 
-        // Pano Yapıştırma
         async function pasteText() {
             try {
                 const text = await navigator.clipboard.readText();
-                if (text) {
-                    const input = document.getElementById("barcodeValue");
-                    input.value = text;
-                    generateBarcode();
-                    input.focus();
-                }
-            } catch (err) {
-                console.warn("Pano erişimi başarısız.");
-            }
+                document.getElementById("barcodeValue").value = text;
+                generateBarcode();
+            } catch (err) { }
         }
 
-        // Girişi Temizle
         function clearInput() {
             document.getElementById("barcodeValue").value = "";
             document.getElementById("barcode").innerHTML = "";
         }
 
-        // PNG İndirme (Beyaz Arka Planlı)
         function downloadPNG() {
             const svg = document.querySelector("#barcode");
             if (!svg.innerHTML) return;
-
             const svgData = new XMLSerializer().serializeToString(svg);
             const canvas = document.createElement("canvas");
             const ctx = canvas.getContext("2d");
             const img = new Image();
-            
             img.onload = function() {
                 canvas.width = img.width + 60;
                 canvas.height = img.height + 60;
                 ctx.fillStyle = "white";
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.drawImage(img, 30, 30);
-                
                 const link = document.createElement("a");
                 link.download = `barkod-${Date.now()}.png`;
                 link.href = canvas.toDataURL("image/png");
                 link.click();
             };
-            
             img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)));
         }
 
-        // Sayfa açıldığında ilk barkodu oluştur
         window.onload = generateBarcode;
     </script>
 </body>
