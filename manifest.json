@@ -1,6 +1,6 @@
 {
   "name": "Barkod Studio Pro",
-  "short_name": "Barkod Pro",
+  "short_name": "Barkod Studio Pro",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#2563eb",
