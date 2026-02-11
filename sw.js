@@ -2,6 +2,8 @@ const CACHE_NAME = 'barkod-v1';
 const assets = [
   './',
   './index.html',
+  './icon-192.png',
+  './icon-512.png',
   'https://cdn.tailwindcss.com',
   'https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js'
 ];
